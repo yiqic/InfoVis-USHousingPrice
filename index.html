@@ -72,6 +72,8 @@
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -116,11 +118,21 @@
             <h4>Team <strong>BlueFly</strong></h4>
             <br>
             <!--<a href="#about" class="btn btn-dark btn-lg">Find Out More</a>-->
-
-
+            
+            <div class="container">
+                
+                <img id="loading" src="img/loading.gif" width="100px;"></img>
+                <div style="margin-left:10px;"> 
+                    <span id="playButtonDiv" style=""><img id="playButton" onclick="animateButton()" src="img/play.png"> Animate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span id="amount" style="font-size:84px"> </span>
+                    <span id="quarter" style="font-size:54px">&nbsp;&nbsp;Q1</span>
+                </div>
+                 
+                <div id="slider-range-min"></div>
+            </div>
 
             <div id="tooltip"></div><!-- div to hold tooltip. -->
-            <svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
+            <svg  width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
         </div>
     </header>
 
@@ -159,9 +171,41 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="InfoVisGraphs/app.js"></script>
 
+    <script src="js/jquery.animateNumber.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
 
     <!-- Custom Theme JavaScript -->
     <script>
+$( document ).ready(function() {
+
+
+    $('#quarter').hide();
+    $('#playButtonDiv').hide();
+    $('#loading').fadeOut(3000);
+
+    setTimeout(function(){ 
+        $('#amount') .prop('number', Math.floor(Math.random()*9999)).animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
+        $('#quarter').show();
+        $('#playButtonDiv').show();
+
+        $(function() {
+            $( "#slider-range-min" ).slider({
+              range: "min",
+              value: 2000,
+              min: 2000,
+              max: 2010,
+              slide: function( event, ui ) {
+                $( "#amount" ).animateNumber({ number: ui.value },0);
+              }
+            });
+            $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) );
+        });
+
+
+     }, 3000);
+    
     // Closes the sidebar menu
     $("#menu-close").click(function(e) {
         e.preventDefault();
@@ -190,14 +234,18 @@
             }
         });
     });
+    });
 
     /*InfoVisGraph Code*/
     function tooltipHtml(n, d){ /* function to create html content string in tooltip div. */
         return "<h4>"+n+"</h4><table>"+
-            "<tr><td>Low</td><td>"+(d.low)+"</td></tr>"+
-            "<tr><td>Average</td><td>"+(d.avg)+"</td></tr>"+
-            "<tr><td>High</td><td>"+(d.high)+"</td></tr>"+
+            "<tr><td colspan=\"2\"><p style=\"font-size:7px;margin-top:5px;\">Single Family Home</p></td></tr>"+
+            "<tr><td>Average</td><td>"+"$"+(d.average)+"</td></tr>"+
+            "<tr><td>Median</td><td>"+"$"+(d.median)+"</td></tr>"+
             "</table>";
+    }
+    function animateButton(){
+        alert("Animate Button Pressed!");
     }
     
     var sampleData ={}; /* Sample random data. */   
@@ -207,15 +255,15 @@
     "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
     "WI", "MO", "AR", "OK", "KS", "LS", "VA"]
         .forEach(function(d){ 
-            var low=Math.round(100*Math.random()), 
-                mid=Math.round(100*Math.random()), 
-                high=Math.round(100*Math.random());
-            sampleData[d]={low:d3.min([low,mid,high]), high:d3.max([low,mid,high]), 
-                    avg:Math.round((low+mid+high)/3), color:d3.interpolate("#ffffcc", "#800026")(low/100)}; 
+            var average=Math.round(100000*Math.random()), 
+                median=average+Math.round(10000*Math.random());
+            sampleData[d]={average:average, median:median, 
+                     color:d3.interpolate("#CCFFCC", "#006600")(average/100000)}; 
         });
     
     /* draw states on id #statesvg */   
     uStates.draw("#statesvg", sampleData, tooltipHtml);
+
     </script>
 
 </body>

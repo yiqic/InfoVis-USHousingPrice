@@ -29,6 +29,20 @@ body {
     font-weight: 700;
 }
 
+/* Play Buttong Styling-Charles */
+#playButton{
+    cursor:pointer;
+    width:42px;
+    height:42px;
+}
+#playButton:hover{
+    opacity: 0.8;
+}
+#playButton:active{
+    opacity: 0.4;
+}
+
+
 /* Custom Button Styles */
 
 .btn-dark {
