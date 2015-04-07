@@ -233,7 +233,51 @@ $( document ).ready(function() {
             }
         });
     });
+
+
+        //Data CSV File
+
+        d3.csv("dataset.csv", function(data){
+
+            alert(data[getIndex(WY,2010,2)].State);
+            alert(data[getIndex(WY,2010,2)].YearQuarter);
+            alert(data[getIndex(WY,2010,2)].AveragePrice);
+            alert(data[getIndex(WY,2010,2)].MedianPrice);
+
+
+            /*
+        completeDataSet = [];
+        stateDataSet = [];  
+
+        for(var a = data.length-1; a>=0; a--){
+            $("#checkbox").prepend("<input type=\"checkbox\" name=\"country\" value=\""+a+"\" />"+data[a].Country+" <br />");
+            completeDataSet.push({text: data[a].Country,  count: data[a].TotalMedals, goldCount: data[a].GoldMedals, 
+              silverCount: data[a].Silver, bronzeCount: data[a].Bronze});
+          }*/
+
+
+        });
     });
+
+var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID=14,IL=15,IN=16,KS=17,KY=18,LA=19,MA=20,MD=21,ME=22,MI=23,MN=24,MO=25,MS=26,MT=27,NC=28,ND=29,NE=30,NH=31,NJ=32,NM=33,NV=34,NY=35,OH=36,OK=37,OR=38,PA=39,RI=40,SC=41,SD=42,TN=43,TX=44,UT=45,VA=46,VT=47,WA=48,WI=49,WV=50,WY=51;
+
+ 
+// Formula for Index: (state#) * 42 + year*4 + Quarter#
+    var completeDataSet;
+
+    function getIndex(StateName, Year, Quarter){
+        if(StateName>51 || StateName<51 || Year > 2010 || Year <2000 || Quarter >4 || Quarter <0){
+            alert("Data Out of Bounds: Please Refresh Website.")
+            return 0;
+        }
+        if(Year == 2010 && Quarter >2){
+            alert("Data Out of Bounds: Please Refresh Website.")
+            return 0;
+        }
+
+        return (StateName * 42 + (Year-2000)*4 + Quarter-1);
+
+    }
 
     /*InfoVisGraph Code*/
     function tooltipHtml(n, d){ /* function to create html content string in tooltip div. */
