@@ -190,7 +190,7 @@ function startTransitions (svg, chartWidth, chartHeight, rectClip, markers, x) {
 }
 
 function makeChart (data, markers) {
-  var svgWidth  = 960,
+  var svgWidth  = 1200,
       svgHeight = 300,
       margin = { top: 20, right: 20, bottom: 40, left: 40 },
       chartWidth  = svgWidth  - margin.left - margin.right,
