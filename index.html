@@ -47,18 +47,6 @@
         text-align:center;
     }
 
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .line {
-      fill: none;
-      stroke: steelblue;
-      stroke-width: 1.5px;
-    }
 </style>
 <html lang="en">
 
@@ -79,7 +67,7 @@
     <link href="css/stylish-portfolio.css" rel="stylesheet">
 
     <!--App.CSS aka. Line Graph-->
-    <link rel="stylesheet" href="InfoVisGraphs/app.css">
+    <link href="css/app.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -179,9 +167,9 @@
     <script src="js/bootstrap.min.js"></script>
 
     <!--InfoVisGraph Javascripts-->
-    <script src="InfoVisGraphs/uStates.js"></script> <!-- creates uStates. -->
+    <script src="js/uStates.js"></script> <!-- creates uStates. -->
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="InfoVisGraphs/app.js"></script>
+    <script src="js/app.js"></script>
 
     <script src="js/jquery.animateNumber.min.js"></script>
 
@@ -250,7 +238,7 @@ $( document ).ready(function() {
 
         //Data CSV File
 
-        d3.csv("dataset.csv", function(data){
+        d3.csv("dataset/dataset.csv", function(data){
 
             alert(data[getIndex(WY,2010,2)].State);
             alert(data[getIndex(WY,2010,2)].YearQuarter);

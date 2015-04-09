@@ -233,6 +233,10 @@ function formatQuarter (d) {
   }
 }
 
+function addMarker () {
+  return null;
+}
+
 function makeChart (data) {
   var svgWidth  = 1200,
       svgHeight = 300,
@@ -289,11 +293,12 @@ function makeChart (data) {
       .attr("class", "line")
       .attr("d", line);
 
+  addMarker();
 }
 
 var parseDate  = d3.time.format('%Y-%m-%d').parse;
 
-d3.csv('dataset.csv', function (error, rawData) {
+d3.csv('dataset/dataset.csv', function (error, rawData) {
   if (error) {
     console.error(error);
     return;
