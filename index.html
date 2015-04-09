@@ -240,10 +240,10 @@ $( document ).ready(function() {
 
         d3.csv("dataset/dataset.csv", function(data){
 
-            alert(data[getIndex(WY,2010,2)].State);
-            alert(data[getIndex(WY,2010,2)].YearQuarter);
-            alert(data[getIndex(WY,2010,2)].AveragePrice);
-            alert(data[getIndex(WY,2010,2)].MedianPrice);
+            // alert(data[getIndex(WY,2010,2)].State);
+            // alert(data[getIndex(WY,2010,2)].YearQuarter);
+            // alert(data[getIndex(WY,2010,2)].AveragePrice);
+            // alert(data[getIndex(WY,2010,2)].MedianPrice);
 
 
             /*
@@ -306,7 +306,9 @@ var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID
         });
     
     /* draw states on id #statesvg */   
-    uStates.draw("#statesvg", sampleData, tooltipHtml);
+    // console.log(selectState);
+    d3.select("#statesvg").on("click", deselectState);
+    uStates.draw("#statesvg", sampleData, tooltipHtml, selectState);
 
     </script>
 

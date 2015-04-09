@@ -11,10 +11,16 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.line {
+.country-line {
   fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+  stroke: black;
+  stroke-width: 3px;
+}
+
+.state-line {
+  fill: none;
+  /*stroke: red;*/
+  stroke-width: 2px;
 }
 
 .axis .tick line {

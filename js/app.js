@@ -237,10 +237,24 @@ function addMarker () {
   return null;
 }
 
+function deselectState () {
+  d3.selectAll(".state-line")
+    .style("display", "none");
+  d3.selectAll(".state-text")
+    .style("display", "none");
+}
+
+function selectState (stateData) {
+  // deselectState();
+  d3.event.stopPropagation();
+  d3.selectAll("." + stateData.id + "-line")
+    .style("display", "inline");
+}
+
 function makeChart (data) {
   var svgWidth  = 1200,
       svgHeight = 300,
-      margin = { top: 20, right: 20, bottom: 40, left: 80 },
+      margin = { top: 20, right: 40, bottom: 40, left: 80 },
       chartWidth  = svgWidth  - margin.left - margin.right,
       chartHeight = svgHeight - margin.top  - margin.bottom;
 
@@ -257,6 +271,8 @@ function makeChart (data) {
   var yAxis = d3.svg.axis()
       .scale(y)
       .orient("left");
+
+  var color = d3.scale.category20b();
 
   var line = d3.svg.line()
       .interpolate('basis')
@@ -290,8 +306,31 @@ function makeChart (data) {
 
   svg.append("path")
       .datum(data.filter(function(d) { return d.State == 'US'; } ))
-      .attr("class", "line")
+      .attr("class", "country-line")
       .attr("d", line);
+
+  svg.append("text")
+      .datum(data.filter(function(d) { return d.State == 'US' && d.YearQuarter == '2010Q2'; } ))
+      .attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; })
+      .text("US");
+
+  var states = d3.map(data, function(d) { return d.State; }).keys();
+
+  states.forEach(function (state, i) {
+    svg.append("path")
+        .datum(data.filter(function(d) { return d.State == state; }))
+        .attr("class", "state-line " + state + "-line")
+        .style("stroke", color(i % 20))
+        .style("display", "none")
+        .attr("d", line);
+
+    svg.append("text")
+        .datum(data.filter(function(d) { return d.State == state && d.YearQuarter == '2010Q2'; } ))
+        .attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; })
+        .attr("class", "state-text " + state + "-line")
+        .style("display", "none")
+        .text(state);
+  })
 
   addMarker();
 }
@@ -331,4 +370,5 @@ d3.csv('dataset/dataset.csv', function (error, rawData) {
   //   makeChart(data, markers);
   // });
   makeChart(data);
+  // selectState("WA");
 });
