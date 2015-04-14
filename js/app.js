@@ -242,7 +242,7 @@ function addMarker (svg, chartWidth, svgHeight, x) {
           var index = x(data[i].times);
           var line = svg.append("line")
           line.attr("x1", index)
-              .attr("y1", svgHeight - 60)
+              .attr("y1", svgHeight - 40)
               .attr("x2", index)
               .attr("y2", 120)
               .attr("stroke", "black")
@@ -298,10 +298,11 @@ function selectState (stateData) {
     .style("display", "inline");
 }
 
+
 function makeChart (data) {
   var svgWidth  = 750,
       svgHeight = 300,
-      margin = { top: 20, right: 40, bottom: 40, left: 80 },
+      margin = { top: 20, right: 40, bottom: 20, left: 80 },
       chartWidth  = svgWidth  - margin.left - margin.right,
       chartHeight = svgHeight - margin.top  - margin.bottom;
 
@@ -317,7 +318,9 @@ function makeChart (data) {
 
   var yAxis = d3.svg.axis()
       .scale(y)
-      .orient("left");
+      .orient("left")
+      .ticks(5)
+      .tickSize(-chartWidth);
 
   var color = d3.scale.category20b();
 
@@ -330,12 +333,18 @@ function makeChart (data) {
     .attr('width',  svgWidth)
     .attr('height', svgHeight)
     .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
   y.domain([0,d3.max(data, function(d) { return d.MedianPrice; })]);
   // console.log(d3.max(data, function(d) { return d.MedianPrice; }));
 
+  var zoom = d3.behavior.zoom()
+    .y(y)
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+  svg.call(zoom, svg);
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + chartHeight + ")")
@@ -353,12 +362,14 @@ function makeChart (data) {
 
   svg.append("path")
       .datum(data.filter(function(d) { return d.State == 'US'; } ))
-      .attr("class", "country-line")
+      .attr("class", "line country-line")
+      .attr("clip-path", "url(#clip)")
       .attr("d", line);
 
   svg.append("text")
       .datum(data.filter(function(d) { return d.State == 'US' && d.YearQuarter == '2010Q2'; } ))
       .attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; })
+      .attr("class", "us-text")
       .text("US");
 
   var states = d3.map(data, function(d) { return d.State; }).keys();
@@ -366,9 +377,10 @@ function makeChart (data) {
   states.forEach(function (state, i) {
     svg.append("path")
         .datum(data.filter(function(d) { return d.State == state; }))
-        .attr("class", "state-line " + state + "-line")
+        .attr("class", "line state-line " + state + "-line")
         .style("stroke", color(i % 20))
         .style("display", "none")
+        .attr("clip-path", "url(#clip)")
         .attr("d", line);
 
     svg.append("text")
@@ -377,12 +389,42 @@ function makeChart (data) {
         .attr("class", "state-text " + state + "-line")
         .style("display", "none")
         .text(state);
+
   })
 
+  svg.append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", chartWidth)
+    .attr("height", chartHeight);
+
+
   addMarker(svg, chartWidth, svgHeight, x);
+
+  function zoomed() {
+    // svg.select(".x.axis").call(xAxis);
+    svg.select(".y.axis").call(yAxis);
+    svg.selectAll('path.line').attr('d', line); 
+    svg.selectAll('.us-text').attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; });
+    svg.selectAll('.state-text').attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; });
+  }
+
+  function reset() {
+    d3.transition().duration(750).tween("zoom", function() {
+          iy = d3.interpolate(y.domain(), [0,d3.max(data, function(d) { return d.MedianPrice; })]);
+      return function(t) {
+        zoom.y(y.domain(iy(t)));
+        zoomed();
+      };
+    });
+  }
+
+  d3.select("#resetlinegraph").on("click", reset);
 }
 
 var parseDate  = d3.time.format('%Y-%m-%d').parse;
+
+
 
 d3.csv('dataset/dataset.csv', function (error, rawData) {
   if (error) {

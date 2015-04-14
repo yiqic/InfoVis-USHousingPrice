@@ -13,6 +13,11 @@
         width: 640px;
         right: 65px;
     }*/
+    button {
+      position: absolute;
+      right: 40px;
+      top: 100px;
+    }
     #tooltip {   
         position: absolute;           
         text-align: center;
@@ -127,6 +132,7 @@
 
             <div id="tooltip"></div><!-- div to hold tooltip. -->
             <div id="graph">
+                <button id="resetlinegraph">Reset</button>
                 <svg  width="480" height="300" id="statesvg">
                     <g transform="scale(0.5)" id="statemap"></g>
                 </svg> <!-- svg to hold the map. -->
