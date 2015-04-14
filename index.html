@@ -121,7 +121,11 @@
             <!--<a href="#about" class="btn btn-dark btn-lg">Find Out More</a>-->
 
             <div id="tooltip"></div><!-- div to hold tooltip. -->
-            <svg  width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
+            <div id="graph">
+                <svg  width="480" height="300" id="statesvg">
+                    <g transform="scale(0.5)" id="statemap"></g>
+                </svg> <!-- svg to hold the map. -->
+            </div>
             <div class="container">
                 
                 <img id="loading" src="img/loading.gif" width="100px;"></img>
@@ -310,6 +314,8 @@ var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID
     var stateArray = ["US","AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LS","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
     
     var stateList;
+    // var statemap = d3.select("#statesvg").append("g")
+    //     .
     setTimeout(function(){ 
         stateList = ["VA", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
         "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
@@ -325,7 +331,7 @@ var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID
     }, 500); 
     setTimeout(function(){
         //console.log(sampleData);  
-        uStates.draw("#statesvg", sampleData, tooltipHtml, selectState);
+        uStates.draw("#statemap", sampleData, tooltipHtml, selectState);
     },700);
 
         /*.forEach(function(d){ 

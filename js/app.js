@@ -132,62 +132,62 @@ function addAxesAndLegend (svg, xAxis, yAxis, margin, chartWidth, chartHeight) {
 //     .attr('clip-path', 'url(#rect-clip)');
 // }
 
-function addMarker (marker, svg, chartHeight, x) {
-  var radius = 32,
-      xPos = x(marker.date) - radius - 3,
-      yPosStart = chartHeight - radius - 3,
-      yPosEnd = (marker.type === 'Client' ? 80 : 160) + radius - 3;
+// function addMarker (marker, svg, chartHeight, x) {
+//   var radius = 32,
+//       xPos = x(marker.date) - radius - 3,
+//       yPosStart = chartHeight - radius - 3,
+//       yPosEnd = (marker.type === 'Client' ? 80 : 160) + radius - 3;
 
-  var markerG = svg.append('g')
-    .attr('class', 'marker '+marker.type.toLowerCase())
-    .attr('transform', 'translate(' + xPos + ', ' + yPosStart + ')')
-    .attr('opacity', 0);
+//   var markerG = svg.append('g')
+//     .attr('class', 'marker '+marker.type.toLowerCase())
+//     .attr('transform', 'translate(' + xPos + ', ' + yPosStart + ')')
+//     .attr('opacity', 0);
 
-  markerG.transition()
-    .duration(1000)
-    .attr('transform', 'translate(' + xPos + ', ' + yPosEnd + ')')
-    .attr('opacity', 1);
+//   markerG.transition()
+//     .duration(1000)
+//     .attr('transform', 'translate(' + xPos + ', ' + yPosEnd + ')')
+//     .attr('opacity', 1);
 
-  markerG.append('path')
-    .attr('d', 'M' + radius + ',' + (chartHeight-yPosStart) + 'L' + radius + ',' + (chartHeight-yPosStart))
-    .transition()
-      .duration(1000)
-      .attr('d', 'M' + radius + ',' + (chartHeight-yPosEnd) + 'L' + radius + ',' + (radius*2));
+//   markerG.append('path')
+//     .attr('d', 'M' + radius + ',' + (chartHeight-yPosStart) + 'L' + radius + ',' + (chartHeight-yPosStart))
+//     .transition()
+//       .duration(1000)
+//       .attr('d', 'M' + radius + ',' + (chartHeight-yPosEnd) + 'L' + radius + ',' + (radius*2));
 
-  markerG.append('circle')
-    .attr('class', 'marker-bg')
-    .attr('cx', radius)
-    .attr('cy', radius)
-    .attr('r', radius);
+//   markerG.append('circle')
+//     .attr('class', 'marker-bg')
+//     .attr('cx', radius)
+//     .attr('cy', radius)
+//     .attr('r', radius);
 
-    //Hides Some extraneous data -Cheng Ding
-  /*markerG.append('text')
-    .attr('x', radius)
-    .attr('y', radius*0.9)
-    .text(marker.type);
+//     //Hides Some extraneous data -Cheng Ding
+//   /*markerG.append('text')
+//     .attr('x', radius)
+//     .attr('y', radius*0.9)
+//     .text(marker.type);
 
-  markerG.append('text')
-    .attr('x', radius)
-    .attr('y', radius*1.5)
-    .text(marker.version);*/
+//   markerG.append('text')
+//     .attr('x', radius)
+//     .attr('y', radius*1.5)
+//     .text(marker.version);*/
 
-  markerG.append('text')
-    .attr('x', radius)
-    .attr('y', radius*1.2)
-    .text(marker.version);
-}
+//   markerG.append('text')
+//     .attr('x', radius)
+//     .attr('y', radius*1.2)
+//     .text(marker.version);
+// }
 
-function startTransitions (svg, chartWidth, chartHeight, rectClip, markers, x) {
-  rectClip.transition()
-    .duration(1000*markers.length)
-    .attr('width', chartWidth);
+// function startTransitions (svg, chartWidth, chartHeight, rectClip, markers, x) {
+//   rectClip.transition()
+//     .duration(1000*markers.length)
+//     .attr('width', chartWidth);
 
-  markers.forEach(function (marker, i) {
-    setTimeout(function () {
-      addMarker(marker, svg, chartHeight, x);
-    }, 1000 + 500*i);
-  });
-}
+//   markers.forEach(function (marker, i) {
+//     setTimeout(function () {
+//       addMarker(marker, svg, chartHeight, x);
+//     }, 1000 + 500*i);
+//   });
+// }
 
 // function makeChart (data) {
 //   var svgWidth  = 1200,
@@ -233,8 +233,55 @@ function formatQuarter (d) {
   }
 }
 
-function addMarker () {
-  return null;
+function addMarker (svg, chartWidth, svgHeight, x) {
+
+    d3.csv("dataset/eventsquarter.csv",function(data) {
+      console.log(data.length)
+      for (i = 0; i < data.length; i++) {
+          // var index = (  ((parseInt((data[i].times).substring(0,4)) - 2000) * 3 + (parseInt((data[i].times).substring(5,6))) * 1.15 )) 
+          var index = x(data[i].times);
+          var line = svg.append("line")
+          line.attr("x1", index)
+              .attr("y1", svgHeight - 60)
+              .attr("x2", index)
+              .attr("y2", 120)
+              .attr("stroke", "black")
+              .attr("stroke-width", 2)
+              .attr("opacity", 0.4);
+
+          if (data[i].importance == 1) {
+              var strArr = (data[i].events).split(" ")
+              var strOne = strArr[0]
+              var strTwo = strArr[1]
+              svg.append("circle")
+                 .attr("cx", index)
+                 .attr("cy", 70)
+                 .attr("r", 50)
+                 .attr("fill", "rgba(255, 255, 0, 0.65)")
+                 .attr("stroke", "rgba(255, 0, 0, 0.25)")
+                 .attr("stroke-width", 12)
+                 .attr("opacity", 0.8)
+
+              svg.append("text")
+                 .text(strOne)
+                 .attr("x", index)
+                 .attr("y", 60)
+                 .attr("fill", "black")
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", "18px")
+                 .attr("text-anchor", "middle");
+
+              svg.append("text")
+                 .text(strTwo)
+                 .attr("x", index)
+                 .attr("y", 90)
+                 .attr("fill", "black")
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", "18px")
+                 .attr("text-anchor", "middle");
+          }
+      }
+    });
 }
 
 function deselectState () {
@@ -252,7 +299,7 @@ function selectState (stateData) {
 }
 
 function makeChart (data) {
-  var svgWidth  = 1200,
+  var svgWidth  = 750,
       svgHeight = 300,
       margin = { top: 20, right: 40, bottom: 40, left: 80 },
       chartWidth  = svgWidth  - margin.left - margin.right,
@@ -279,7 +326,7 @@ function makeChart (data) {
       .x(function(d) { return x(d.YearQuarter); })
       .y(function(d) { return y(d.MedianPrice); });
 
-  var svg = d3.select('#display').append('svg')
+  var svg = d3.select('#graph').append('svg')
     .attr('width',  svgWidth)
     .attr('height', svgHeight)
     .append('g')
@@ -332,7 +379,7 @@ function makeChart (data) {
         .text(state);
   })
 
-  addMarker();
+  addMarker(svg, chartWidth, svgHeight, x);
 }
 
 var parseDate  = d3.time.format('%Y-%m-%d').parse;
