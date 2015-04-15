@@ -236,7 +236,6 @@ function formatQuarter (d) {
 function addMarker (svg, chartWidth, svgHeight, x) {
 
     d3.csv("dataset/eventsquarter.csv",function(data) {
-      console.log(data.length)
       for (i = 0; i < data.length; i++) {
           // var index = (  ((parseInt((data[i].times).substring(0,4)) - 2000) * 3 + (parseInt((data[i].times).substring(5,6))) * 1.15 )) 
           var index = x(data[i].times);
@@ -367,8 +366,12 @@ function makeChart (data) {
       .attr("d", line);
 
   svg.append("text")
-      .datum(data.filter(function(d) { return d.State == 'US' && d.YearQuarter == '2010Q2'; } ))
-      .attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; })
+      .datum(data.filter(function(d) { 
+        return d.State == 'US' && d.YearQuarter == '2010Q2'; 
+      } ))
+      .attr("transform", function(d) { 
+        return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+      })
       .attr("class", "us-text")
       .text("US");
 
@@ -384,8 +387,12 @@ function makeChart (data) {
         .attr("d", line);
 
     svg.append("text")
-        .datum(data.filter(function(d) { return d.State == state && d.YearQuarter == '2010Q2'; } ))
-        .attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; })
+        .datum(data.filter(function(d) { 
+          return d.State == state && d.YearQuarter == '2010Q2'; 
+        } ))
+        .attr("transform", function(d) { 
+          return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+        })
         .attr("class", "state-text " + state + "-line")
         .style("display", "none")
         .text(state);
@@ -405,8 +412,12 @@ function makeChart (data) {
     // svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
     svg.selectAll('path.line').attr('d', line); 
-    svg.selectAll('.us-text').attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; });
-    svg.selectAll('.state-text').attr("transform", function(d) { return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; });
+    svg.selectAll('.us-text').attr("transform", function(d) { 
+      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+    });
+    svg.selectAll('.state-text').attr("transform", function(d) { 
+      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+    });
   }
 
   function reset() {
