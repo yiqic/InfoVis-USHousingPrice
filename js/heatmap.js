@@ -8,7 +8,8 @@ $('#stopButtonDiv').hide();
 $('#loading').fadeOut(3000);
 
 setTimeout(function(){ 
-    $('#amount') .prop('number', Math.floor(Math.random()*9999)).animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
+    $('#amount').prop('number', Math.floor(Math.random()*9999))
+        .animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
     $('#quarter').show();
     $('#playButtonDiv').show();
     $('#stopButtonDiv').show();
