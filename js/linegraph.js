@@ -369,7 +369,9 @@ function makeChart (data) {
         .style("stroke", color(i % 20))
         .style("display", "none")
         .attr("clip-path", "url(#clip)")
-        .attr("d", line);
+        .attr("d", line)
+        .on("mouseover", lineMouseOver)
+        .on("mouseout", lineMouseOut);
 
     svg.append("text")
         .datum(data.filter(function(d) { 
@@ -392,6 +394,18 @@ function makeChart (data) {
 
 
   addMarker(svg, chartWidth, chartHeight, x);
+
+  function lineMouseOver(da) {
+    d3.select("." + da[0].State + "-line").style("stroke-width", 5);
+    d3.selectAll(".state")
+      .filter(function(d) { return d.id == da[0].State; })
+      .style("opacity", 0.5);
+  }
+
+  function lineMouseOut() {
+    d3.selectAll(".state-line").style("stroke-width", 2);
+    d3.selectAll(".state").style("opacity", 1);
+  }
 
   function zoomed() {
     // svg.select(".x.axis").call(xAxis);

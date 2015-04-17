@@ -56,6 +56,9 @@
 		
 	uStates.draw = function(id, data, toolTip, clickFunction){		
 		function mouseOver(d){
+
+			d3.select("." + d.id + "-line").style("stroke-width", 5);
+
 			d3.select("#tooltip").transition().duration(200).style("opacity", .9);      
 			
 			d3.select("#tooltip").html(toolTip(d.n, data[d.id]))  
@@ -64,6 +67,7 @@
 		}
 		
 		function mouseOut(){
+			d3.selectAll(".state-line").style("stroke-width", 2);
 			d3.select("#tooltip").transition().duration(500).style("opacity", 0);      
 		}
 		d3.select(id).selectAll(".state")
