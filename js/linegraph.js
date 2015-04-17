@@ -317,7 +317,6 @@ function makeChart (data) {
     .append('g')
     .attr('id', 'linegraph')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-  // var svg = d3.select("#linegraph");
 
 
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
