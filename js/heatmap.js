@@ -5,13 +5,15 @@ $( document ).ready(function() {
 $('#quarter').hide();
 $('#playButtonDiv').hide();
 $('#stopButtonDiv').hide();
-$('#loading').fadeOut(3000);
+$('#legendContainer').hide();
+$('#loading').fadeOut(500);
 
 setTimeout(function(){ 
     $('#amount') .prop('number', Math.floor(Math.random()*9999)).animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
     $('#quarter').show();
     $('#playButtonDiv').show();
     $('#stopButtonDiv').show();
+    $('#legendContainer').show();
 
     $(function() {
         $( "#slider-range-min" ).slider({
@@ -38,7 +40,7 @@ setTimeout(function(){
     });
 
 
- }, 3000);
+ }, 500);
 
 // Closes the sidebar menu
 $("#menu-close").click(function(e) {
@@ -122,10 +124,11 @@ function updateHeatMap(year, quarter, waitTimerDrawMap, waitTimerLoadData){
             var averageInteger = Number(average.replace(/[^0-9\.]+/g,""));
             //Middle Yellowish Color = #FFFFBF, Green #006837, and Red = #A50026
             //Highest Price is $600,000
+            //Lowest Price is &80,000
             var averageColorRatio = averageInteger/600000;
             var color;
             if(averageInteger<150000){
-                color = d3.interpolate("#006837", "#FFFFBF")(averageInteger/150000);
+                color = d3.interpolate("#006837", "#FFFFBF")((averageInteger-80000)/70000);
             }else{
                 color = d3.interpolate("#FFFFBF", "#A50026")((averageInteger-150000)/450000);
             }
