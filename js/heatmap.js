@@ -14,14 +14,22 @@ setTimeout(function(){
     $(function() {
         $( "#slider-range-min" ).slider({
           range: "min",
-          value: 2000,
-          min: 2000,
-          max: 2010,
+          value: 2000.00,
+          min: 2000.00,
+          max: 2010.49,
+          step:0.25,
           slide: function( event, ui ) {
-            $( "#amount" ).animateNumber({ number: ui.value },0);
+
+            //Updates Slider Values
+            var year = Math.floor(ui.value);
+            $( "#amount" ).animateNumber({ number: year },0);
+            var quarter = Math.floor(((ui.value*100) - Math.floor(ui.value)*100)/25+1);  //Value from 1-4 representing which quarter
+            document.getElementById("quarter").innerHTML = "Q"+quarter;
+
+            updateHeatMap(year, quarter, 20, 20);
           }
         });
-        $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ) );
+        $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ));
     });
 
 
@@ -61,24 +69,6 @@ $(function() {
 
     d3.csv("dataset/dataset.csv", function(data){
         completeDataSet = data;
-        // alert(data[getIndex(WY,2010,2)].State);
-        // alert(data[getIndex(WY,2010,2)].YearQuarter);
-        // alert(data[getIndex(WY,2010,2)].AveragePrice);
-        // alert(data[getIndex(WY,2010,2)].MedianPrice);
-        // data[row#].ColumnName
-
-
-        /*
-    completeDataSet = [];
-    stateDataSet = [];  
-
-    for(var a = data.length-1; a>=0; a--){
-        $("#checkbox").prepend("<input type=\"checkbox\" name=\"country\" value=\""+a+"\" />"+data[a].Country+" <br />");
-        completeDataSet.push({text: data[a].Country,  count: data[a].TotalMedals, goldCount: data[a].GoldMedals, 
-          silverCount: data[a].Silver, bronzeCount: data[a].Bronze});
-      }*/
-
-
     });
 });
 
@@ -109,6 +99,42 @@ function getIndex(StateName, Year, Quarter){
     return (StateName * 42 + (Year-2000)*4 + Quarter-1);
 
 }
+//draw heat map
+var sampleData ={}; /* Sample random data. */   
+var stateArray = ["US","AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LS","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
+var stateList;
+function updateHeatMap(year, quarter, waitTimerDrawMap, waitTimerLoadData){
+    //Update Heat Map Data
+    setTimeout(function(){ 
+        stateList = ["VA", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
+        "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
+        "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
+        "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
+        "WI", "MO", "AR", "OK", "KS", "LS", "HI"]
+        .forEach(function(d){
+            var average=completeDataSet[getIndex(getStateArrayIndex(d),year,quarter)].AveragePrice; 
+            var median=completeDataSet[getIndex(getStateArrayIndex(d),year,quarter)].MedianPrice;
+            var averageInteger = Number(average.replace(/[^0-9\.]+/g,""));
+            //Middle Yellowish Color = #FFFFBF, Green #006837, and Red = #A50026
+            //Highest Price is $600,000
+            var averageColorRatio = averageInteger/600000;
+            var color;
+            if(averageInteger<150000){
+                color = d3.interpolate("#006837", "#FFFFBF")(averageInteger/150000);
+            }else{
+                color = d3.interpolate("#FFFFBF", "#A50026")((averageInteger-150000)/450000);
+            }
+
+
+            sampleData[d]={average:average, median:median, color: color};        
+        })
+    }, waitTimerLoadData); 
+    setTimeout(function(){
+        //Remove Heat Map
+        $("#statemap").empty();
+        uStates.draw("#statemap", sampleData, tooltipHtml, selectState);
+    },waitTimerDrawMap);
+}
 
 /*InfoVisGraph Code*/
 function tooltipHtml(n, d){ /* function to create html content string in tooltip div. */
@@ -125,41 +151,7 @@ function getStateArrayIndex(data){
     return stateArray.indexOf(data);
 }
 
-var sampleData ={}; /* Sample random data. */   
+updateHeatMap(2000,1, 350, 350);
 
-var stateArray = ["US","AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LS","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
-
-var stateList;
-// var statemap = d3.select("#statesvg").append("g")
-//     .
-setTimeout(function(){ 
-    stateList = ["VA", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
-    "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
-    "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
-    "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
-    "WI", "MO", "AR", "OK", "KS", "LS", "HI"]
-    .forEach(function(d){
-            var average=completeDataSet[getIndex(getStateArrayIndex(d),2009,2)].AveragePrice; 
-            var median=completeDataSet[getIndex(getStateArrayIndex(d),2009,2)].MedianPrice;
-            var averageInteger = Number(average.replace(/[^0-9\.]+/g,""));
-            sampleData[d]={average:average, median:median, color:d3.interpolate("#CCFFCC", "#006600")(averageInteger/600000)};        
-    })
-}, 500); 
-setTimeout(function(){
-    //console.log(sampleData);  
-    uStates.draw("#statemap", sampleData, tooltipHtml, selectState);
-},700);
-
-    /*.forEach(function(d){ 
-        if(d!="US"){
-            var average=completeDataSet[getIndex(stateListindexOf(d),2010,2)].AveragePrice, 
-                median=completeDataSet[getIndex(stateList.indexOf(d),2010,2)].MedianPrice;
-            sampleData[d]={average:average, median:median, 
-                     color:d3.interpolate("#CCFFCC", "#006600")(average/100000)}; 
-        }
-    });*/
-
-/* draw states on id #statesvg */   
-// console.log(selectState);
 d3.select("#statesvg").on("click", deselectState);
 
