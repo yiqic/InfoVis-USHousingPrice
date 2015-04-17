@@ -32,6 +32,7 @@ setTimeout(function(){
             animationQuarter = quarter;
 
             updateHeatMap(year, quarter, 20, 20);
+            updateLineTime(year, quarter);
           }
         });
         $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ));
@@ -180,6 +181,7 @@ function animateButton(){
         /*Update Heat Map*/
         //console.log("Year: "+ animationYear + "Quarter: "+animationQuarter);
         updateHeatMap(animationYear,animationQuarter,10,10);
+        updateLineTime(animationYear,animationQuarter);
         animationQuarter++;
         if(animationQuarter > 4){
             //console.log("Increment Year and reset animationQuarter.");

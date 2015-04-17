@@ -241,9 +241,9 @@ function addMarker (svg, chartWidth, chartHeight, x) {
           svg.append("line")
               .datum(eventData[i])
               .attr("class", "event-line")
-              .attr("x1", x(eventData[i].times))
+              .attr("x1", function(d) { return x(d.times); })
               .attr("y1", 0)
-              .attr("x2", x(eventData[i].times))
+              .attr("x2", function(d) { return x(d.times); })
               .attr("y2", chartHeight)
               .attr("stroke", "black")
               .attr("stroke-width", 3)
@@ -267,19 +267,20 @@ function addMarker (svg, chartWidth, chartHeight, x) {
 }
 
 function deselectState () {
-  d3.selectAll(".state-line")
+  d3.selectAll(".state-group")
     .style("display", "none");
-  d3.selectAll(".state-text")
-    .style("display", "none");
+  // d3.selectAll(".state-text")
+  //   .style("display", "none");
 }
 
 function selectState (stateData) {
   // deselectState();
   d3.event.stopPropagation();
-  d3.selectAll("." + stateData.id + "-line")
+  d3.selectAll("." + stateData.id + "-group")
     .style("display", "inline");
 }
 
+var xIndex; 
 
 function makeChart (data) {
   var svgWidth  = 750,
@@ -343,11 +344,40 @@ function makeChart (data) {
       .style("text-anchor", "end")
       .text("Price ($)");
 
+  addMarker(svg, chartWidth, chartHeight, x);
+
+  xIndex = x;
+  svg.append("line")
+    .attr("id", "time-line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", chartHeight)
+    .attr("stroke", "#e6550d")
+    .attr("stroke-width", 5);
+
   svg.append("path")
       .datum(data.filter(function(d) { return d.State == 'US'; } ))
       .attr("class", "line country-line")
       .attr("clip-path", "url(#clip)")
       .attr("d", line);
+
+  svg.selectAll(".dot")
+      .data(data.filter(function(d) { return d.State == 'US'; }))
+      .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", function(d) { return x(d.YearQuarter); })
+      .attr("cy", function(d) { return y(d.MedianPrice); })
+      .attr("r", 5)
+      .style("display", function(d) {
+        if (d.YearQuarter == "2000Q1") {
+          return "inline";
+        }
+        else {
+          return "none";
+        }
+      });
 
   svg.append("text")
       .datum(data.filter(function(d) { 
@@ -362,17 +392,39 @@ function makeChart (data) {
   var states = d3.map(data, function(d) { return d.State; }).keys();
 
   states.forEach(function (state, i) {
-    svg.append("path")
+    var stateGroup = svg.append("g")
+      .datum(data.filter(function(d) { return d.State == state; }))
+      .attr("class", "state-group " + state + "-group")
+      .style("display", "none");
+
+    stateGroup.append("path")
         .datum(data.filter(function(d) { return d.State == state; }))
         .attr("class", "line state-line " + state + "-line")
         .style("stroke", color(i % 20))
-        .style("display", "none")
         .attr("clip-path", "url(#clip)")
         .attr("d", line)
         .on("mouseover", lineMouseOver)
         .on("mouseout", lineMouseOut);
 
-    svg.append("text")
+    stateGroup.selectAll(".dot")
+        .data(data.filter(function(d) { return d.State == state; }))
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .style("fill", color(i % 20))
+        .attr("cx", function(d) { return x(d.YearQuarter); })
+        .attr("cy", function(d) { return y(d.MedianPrice); })
+        .attr("r", 5)
+        .style("display", function(d) {
+          if (d.YearQuarter == "2000Q1") {
+            return "inline";
+          }
+          else {
+            return "none";
+          }
+        });
+
+    stateGroup.append("text")
         .datum(data.filter(function(d) { 
           return d.State == state && d.YearQuarter == '2010Q2'; 
         } ))
@@ -380,7 +432,6 @@ function makeChart (data) {
           return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
         })
         .attr("class", "state-text " + state + "-line")
-        .style("display", "none")
         .text(state);
 
   })
@@ -391,8 +442,6 @@ function makeChart (data) {
     .attr("width", chartWidth)
     .attr("height", chartHeight);
 
-
-  addMarker(svg, chartWidth, chartHeight, x);
 
   function lineMouseOver(da) {
     d3.select("." + da[0].State + "-line").style("stroke-width", 5);
@@ -410,6 +459,7 @@ function makeChart (data) {
     // svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
     svg.selectAll('path.line').attr('d', line); 
+    svg.selectAll('.dot').attr('cy', function(d) { return y(d.MedianPrice); });
     svg.selectAll('.us-text').attr("transform", function(d) { 
       return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
     });
@@ -432,9 +482,23 @@ function makeChart (data) {
 
 }
 
-var parseDate  = d3.time.format('%Y-%m-%d').parse;
+var parseDate = d3.time.format('%Y-%m-%d').parse;
 
-
+function updateLineTime(year, quarter) {
+  var timeString = "" + year + "Q" + quarter;
+  d3.select("#time-line")
+    .attr("x1", xIndex(timeString))
+    .attr("x2", xIndex(timeString));
+  d3.selectAll(".dot")
+    .style("display", function(d) {
+      if (d.YearQuarter == timeString) {
+        return "inline";
+      }
+      else {
+        return "none";
+      }
+    });
+}
 
 d3.csv('dataset/dataset.csv', function (error, rawData) {
   if (error) {
