@@ -1,229 +1,3 @@
-function addAxesAndLegend (svg, xAxis, yAxis, margin, chartWidth, chartHeight) {
-  var legendWidth  = 200,
-      legendHeight = 100;
-
-  // clipping to make sure nothing appears behind legend
-  svg.append('clipPath')
-    .attr('id', 'axes-clip')
-    .append('polygon')
-      .attr('points', (-margin.left)                 + ',' + (-margin.top)                 + ' ' +
-                      (chartWidth - legendWidth - 1) + ',' + (-margin.top)                 + ' ' +
-                      (chartWidth - legendWidth - 1) + ',' + legendHeight                  + ' ' +
-                      (chartWidth + margin.right)    + ',' + legendHeight                  + ' ' +
-                      (chartWidth + margin.right)    + ',' + (chartHeight + margin.bottom) + ' ' +
-                      (-margin.left)                 + ',' + (chartHeight + margin.bottom));
-
-  var axes = svg.append('g')
-    .attr('clip-path', 'url(#axes-clip)');
-
-  axes.append('g')
-    .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + chartHeight + ')')
-    .call(xAxis);
-
-  axes.append('g')
-    .attr('class', 'y axis')
-    .call(yAxis)
-    .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
-      .style('text-anchor', 'end')
-      .text('Time (s)');
-
-  var legend = svg.append('g')
-    .attr('class', 'legend')
-    .attr('transform', 'translate(' + (chartWidth - legendWidth) + ', 0)');
-
-  legend.append('rect')
-    .attr('class', 'legend-bg')
-    .attr('width',  legendWidth)
-    .attr('height', legendHeight);
-
-  legend.append('rect')
-    .attr('class', 'outer')
-    .attr('width',  75)
-    .attr('height', 20)
-    .attr('x', 10)
-    .attr('y', 10);
-
-  legend.append('text')
-    .attr('x', 115)
-    .attr('y', 25)
-    .text('5% - 95%');
-
-  legend.append('rect')
-    .attr('class', 'inner')
-    .attr('width',  75)
-    .attr('height', 20)
-    .attr('x', 10)
-    .attr('y', 40);
-
-  legend.append('text')
-    .attr('x', 115)
-    .attr('y', 55)
-    .text('25% - 75%');
-
-  legend.append('path')
-    .attr('class', 'median-line')
-    .attr('d', 'M10,80L85,80');
-
-  legend.append('text')
-    .attr('x', 115)
-    .attr('y', 85)
-    .text('Median');
-}
-
-// function drawPaths (svg, data, x, y) {
-//   var upperOuterArea = d3.svg.area()
-//     .interpolate('basis')
-//     .x (function (d) { return x(d.date) || 1; })
-//     .y0(function (d) { return y(d.pct95); })
-//     .y1(function (d) { return y(d.pct75); });
-
-//   var upperInnerArea = d3.svg.area()
-//     .interpolate('basis')
-//     .x (function (d) { return x(d.date) || 1; })
-//     .y0(function (d) { return y(d.pct75); })
-//     .y1(function (d) { return y(d.pct50); });
-
-//   var medianLine = d3.svg.line()
-//     .interpolate('basis')
-//     .x(function (d) { return x(d.date); })
-//     .y(function (d) { return y(d.pct50); });
-
-//   var lowerInnerArea = d3.svg.area()
-//     .interpolate('basis')
-//     .x (function (d) { return x(d.date) || 1; })
-//     .y0(function (d) { return y(d.pct50); })
-//     .y1(function (d) { return y(d.pct25); });
-
-//   var lowerOuterArea = d3.svg.area()
-//     .interpolate('basis')
-//     .x (function (d) { return x(d.date) || 1; })
-//     .y0(function (d) { return y(d.pct25); })
-//     .y1(function (d) { return y(d.pct05); });
-
-//   svg.datum(data);
-
-//   svg.append('path')
-//     .attr('class', 'area upper outer')
-//     .attr('d', upperOuterArea)
-//     .attr('clip-path', 'url(#rect-clip)');
-
-//   svg.append('path')
-//     .attr('class', 'area lower outer')
-//     .attr('d', lowerOuterArea)
-//     .attr('clip-path', 'url(#rect-clip)');
-
-//   svg.append('path')
-//     .attr('class', 'area upper inner')
-//     .attr('d', upperInnerArea)
-//     .attr('clip-path', 'url(#rect-clip)');
-
-//   svg.append('path')
-//     .attr('class', 'area lower inner')
-//     .attr('d', lowerInnerArea)
-//     .attr('clip-path', 'url(#rect-clip)');
-
-//   svg.append('path')
-//     .attr('class', 'median-line')
-//     .attr('d', medianLine)
-//     .attr('clip-path', 'url(#rect-clip)');
-// }
-
-// function addMarker (marker, svg, chartHeight, x) {
-//   var radius = 32,
-//       xPos = x(marker.date) - radius - 3,
-//       yPosStart = chartHeight - radius - 3,
-//       yPosEnd = (marker.type === 'Client' ? 80 : 160) + radius - 3;
-
-//   var markerG = svg.append('g')
-//     .attr('class', 'marker '+marker.type.toLowerCase())
-//     .attr('transform', 'translate(' + xPos + ', ' + yPosStart + ')')
-//     .attr('opacity', 0);
-
-//   markerG.transition()
-//     .duration(1000)
-//     .attr('transform', 'translate(' + xPos + ', ' + yPosEnd + ')')
-//     .attr('opacity', 1);
-
-//   markerG.append('path')
-//     .attr('d', 'M' + radius + ',' + (chartHeight-yPosStart) + 'L' + radius + ',' + (chartHeight-yPosStart))
-//     .transition()
-//       .duration(1000)
-//       .attr('d', 'M' + radius + ',' + (chartHeight-yPosEnd) + 'L' + radius + ',' + (radius*2));
-
-//   markerG.append('circle')
-//     .attr('class', 'marker-bg')
-//     .attr('cx', radius)
-//     .attr('cy', radius)
-//     .attr('r', radius);
-
-//     //Hides Some extraneous data -Cheng Ding
-//   /*markerG.append('text')
-//     .attr('x', radius)
-//     .attr('y', radius*0.9)
-//     .text(marker.type);
-
-//   markerG.append('text')
-//     .attr('x', radius)
-//     .attr('y', radius*1.5)
-//     .text(marker.version);*/
-
-//   markerG.append('text')
-//     .attr('x', radius)
-//     .attr('y', radius*1.2)
-//     .text(marker.version);
-// }
-
-// function startTransitions (svg, chartWidth, chartHeight, rectClip, markers, x) {
-//   rectClip.transition()
-//     .duration(1000*markers.length)
-//     .attr('width', chartWidth);
-
-//   markers.forEach(function (marker, i) {
-//     setTimeout(function () {
-//       addMarker(marker, svg, chartHeight, x);
-//     }, 1000 + 500*i);
-//   });
-// }
-
-// function makeChart (data) {
-//   var svgWidth  = 1200,
-//       svgHeight = 300,
-//       margin = { top: 20, right: 20, bottom: 40, left: 40 },
-//       chartWidth  = svgWidth  - margin.left - margin.right,
-//       chartHeight = svgHeight - margin.top  - margin.bottom;
-
-//   var x = d3.time.scale().range([0, chartWidth])
-//             .domain(d3.extent(data, function (d) { return d.date; })),
-//       y = d3.scale.linear().range([chartHeight, 0])
-//             .domain([0, d3.max(data, function (d) { return d.pct95; })]);
-
-//   var xAxis = d3.svg.axis().scale(x).orient('bottom')
-//                 .innerTickSize(-chartHeight).outerTickSize(0).tickPadding(10),
-//       yAxis = d3.svg.axis().scale(y).orient('left')
-//                 .innerTickSize(-chartWidth).outerTickSize(0).tickPadding(10);
-
-//   var svg = d3.select('#display').append('svg')
-//     .attr('width',  svgWidth)
-//     .attr('height', svgHeight)
-//     .append('g')
-//       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-//   // clipping to start chart hidden and slide it in later
-//   var rectClip = svg.append('clipPath')
-//     .attr('id', 'rect-clip')
-//     .append('rect')
-//       .attr('width', 0)
-//       .attr('height', chartHeight);
-
-//   addAxesAndLegend(svg, xAxis, yAxis, margin, chartWidth, chartHeight);
-//   drawPaths(svg, data, x, y);
-//   startTransitions(svg, chartWidth, chartHeight, rectClip, markers, x);
-// }
-
 function formatQuarter (d) {
   if (d.substring(4) == "Q1") {
     return d.substring(0,4);
@@ -241,9 +15,9 @@ function addMarker (svg, chartWidth, chartHeight, x) {
           svg.append("line")
               .datum(eventData[i])
               .attr("class", "event-line")
-              .attr("x1", x(eventData[i].times))
+              .attr("x1", function(d) { return x(d.times); })
               .attr("y1", 0)
-              .attr("x2", x(eventData[i].times))
+              .attr("x2", function(d) { return x(d.times); })
               .attr("y2", chartHeight)
               .attr("stroke", "black")
               .attr("stroke-width", 3)
@@ -267,19 +41,20 @@ function addMarker (svg, chartWidth, chartHeight, x) {
 }
 
 function deselectState () {
-  d3.selectAll(".state-line")
+  d3.selectAll(".state-group")
     .style("display", "none");
-  d3.selectAll(".state-text")
-    .style("display", "none");
+  // d3.selectAll(".state-text")
+  //   .style("display", "none");
 }
 
 function selectState (stateData) {
   // deselectState();
   d3.event.stopPropagation();
-  d3.selectAll("." + stateData.id + "-line")
+  d3.selectAll("." + stateData.id + "-group")
     .style("display", "inline");
 }
 
+var xIndex; 
 
 function makeChart (data) {
   var svgWidth  = 750,
@@ -317,7 +92,6 @@ function makeChart (data) {
     .append('g')
     .attr('id', 'linegraph')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-  // var svg = d3.select("#linegraph");
 
 
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
@@ -344,11 +118,40 @@ function makeChart (data) {
       .style("text-anchor", "end")
       .text("Price ($)");
 
+  addMarker(svg, chartWidth, chartHeight, x);
+
+  xIndex = x;
+  svg.append("line")
+    .attr("id", "time-line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", chartHeight)
+    .attr("stroke", "#e6550d")
+    .attr("stroke-width", 5);
+
   svg.append("path")
       .datum(data.filter(function(d) { return d.State == 'US'; } ))
       .attr("class", "line country-line")
       .attr("clip-path", "url(#clip)")
       .attr("d", line);
+
+  svg.selectAll(".dot")
+      .data(data.filter(function(d) { return d.State == 'US'; }))
+      .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("cx", function(d) { return x(d.YearQuarter); })
+      .attr("cy", function(d) { return y(d.MedianPrice); })
+      .attr("r", 5)
+      .style("display", function(d) {
+        if (d.YearQuarter == "2000Q1") {
+          return "inline";
+        }
+        else {
+          return "none";
+        }
+      });
 
   svg.append("text")
       .datum(data.filter(function(d) { 
@@ -363,17 +166,39 @@ function makeChart (data) {
   var states = d3.map(data, function(d) { return d.State; }).keys();
 
   states.forEach(function (state, i) {
-    svg.append("path")
+    var stateGroup = svg.append("g")
+      .datum(data.filter(function(d) { return d.State == state; }))
+      .attr("class", "state-group " + state + "-group")
+      .style("display", "none");
+
+    stateGroup.append("path")
         .datum(data.filter(function(d) { return d.State == state; }))
         .attr("class", "line state-line " + state + "-line")
         .style("stroke", color(i % 20))
-        .style("display", "none")
         .attr("clip-path", "url(#clip)")
         .attr("d", line)
         .on("mouseover", lineMouseOver)
         .on("mouseout", lineMouseOut);
 
-    svg.append("text")
+    stateGroup.selectAll(".dot")
+        .data(data.filter(function(d) { return d.State == state; }))
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .style("fill", color(i % 20))
+        .attr("cx", function(d) { return x(d.YearQuarter); })
+        .attr("cy", function(d) { return y(d.MedianPrice); })
+        .attr("r", 5)
+        .style("display", function(d) {
+          if (d.YearQuarter == "2000Q1") {
+            return "inline";
+          }
+          else {
+            return "none";
+          }
+        });
+
+    stateGroup.append("text")
         .datum(data.filter(function(d) { 
           return d.State == state && d.YearQuarter == '2010Q2'; 
         } ))
@@ -381,7 +206,6 @@ function makeChart (data) {
           return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
         })
         .attr("class", "state-text " + state + "-line")
-        .style("display", "none")
         .text(state);
 
   })
@@ -392,8 +216,6 @@ function makeChart (data) {
     .attr("width", chartWidth)
     .attr("height", chartHeight);
 
-
-  addMarker(svg, chartWidth, chartHeight, x);
 
   function lineMouseOver(da) {
     d3.select("." + da[0].State + "-line").style("stroke-width", 5);
@@ -411,6 +233,7 @@ function makeChart (data) {
     // svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
     svg.selectAll('path.line').attr('d', line); 
+    svg.selectAll('.dot').attr('cy', function(d) { return y(d.MedianPrice); });
     svg.selectAll('.us-text').attr("transform", function(d) { 
       return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
     });
@@ -433,9 +256,23 @@ function makeChart (data) {
 
 }
 
-var parseDate  = d3.time.format('%Y-%m-%d').parse;
+var parseDate = d3.time.format('%Y-%m-%d').parse;
 
-
+function updateLineTime(year, quarter) {
+  var timeString = "" + year + "Q" + quarter;
+  d3.select("#time-line")
+    .attr("x1", xIndex(timeString))
+    .attr("x2", xIndex(timeString));
+  d3.selectAll(".dot")
+    .style("display", function(d) {
+      if (d.YearQuarter == timeString) {
+        return "inline";
+      }
+      else {
+        return "none";
+      }
+    });
+}
 
 d3.csv('dataset/dataset.csv', function (error, rawData) {
   if (error) {
@@ -452,23 +289,5 @@ d3.csv('dataset/dataset.csv', function (error, rawData) {
     };
   });
 
-  // d3.csv('dataset.csv', function (error, markerData) {
-  //   if (error) {
-  //     console.error(error);
-  //     return;
-  //   }
-  //   console.log(markerData);
-
-  //   var markers = markerData.map(function (marker) {
-  //     return {
-  //       date: parseDate(marker.date),
-  //       type: marker.type,
-  //       version: marker.version
-  //     };
-  //   });
-
-  //   makeChart(data, markers);
-  // });
   makeChart(data);
-  // selectState("WA");
 });

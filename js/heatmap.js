@@ -9,7 +9,8 @@ $('#legendContainer').hide();
 $('#loading').fadeOut(500);
 
 setTimeout(function(){ 
-    $('#amount') .prop('number', Math.floor(Math.random()*9999)).animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
+    $('#amount').prop('number', Math.floor(Math.random()*9999))
+        .animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
     $('#quarter').show();
     $('#playButtonDiv').show();
     $('#stopButtonDiv').show();
@@ -34,6 +35,7 @@ setTimeout(function(){
             animationQuarter = quarter;
 
             updateHeatMap(year, quarter, 20, 20);
+            updateLineTime(year, quarter);
           }
         });
         $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ));
@@ -183,6 +185,7 @@ function animateButton(){
         /*Update Heat Map*/
         //console.log("Year: "+ animationYear + "Quarter: "+animationQuarter);
         updateHeatMap(animationYear,animationQuarter,10,10);
+        updateLineTime(animationYear,animationQuarter);
         animationQuarter++;
         if(animationQuarter > 4){
             //console.log("Increment Year and reset animationQuarter.");
