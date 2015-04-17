@@ -233,54 +233,37 @@ function formatQuarter (d) {
   }
 }
 
-function addMarker (svg, chartWidth, svgHeight, x) {
+function addMarker (svg, chartWidth, chartHeight, x) {
 
-    d3.csv("dataset/eventsquarter.csv",function(data) {
-      for (i = 0; i < data.length; i++) {
-          // var index = (  ((parseInt((data[i].times).substring(0,4)) - 2000) * 3 + (parseInt((data[i].times).substring(5,6))) * 1.15 )) 
-          var index = x(data[i].times);
-          var line = svg.append("line")
-          line.attr("x1", index)
-              .attr("y1", svgHeight - 40)
-              .attr("x2", index)
-              .attr("y2", 120)
+    d3.csv("dataset/eventsquarter.csv", function(eventData) {
+      
+      for (i = 0; i < eventData.length; i++) {
+          svg.append("line")
+              .datum(eventData[i])
+              .attr("class", "event-line")
+              .attr("x1", x(eventData[i].times))
+              .attr("y1", 0)
+              .attr("x2", x(eventData[i].times))
+              .attr("y2", chartHeight)
               .attr("stroke", "black")
-              .attr("stroke-width", 2)
-              .attr("opacity", 0.4);
-
-          if (data[i].importance == 1) {
-              var strArr = (data[i].events).split(" ")
-              var strOne = strArr[0]
-              var strTwo = strArr[1]
-              svg.append("circle")
-                 .attr("cx", index)
-                 .attr("cy", 70)
-                 .attr("r", 50)
-                 .attr("fill", "rgba(255, 255, 0, 0.65)")
-                 .attr("stroke", "rgba(255, 0, 0, 0.25)")
-                 .attr("stroke-width", 12)
-                 .attr("opacity", 0.8)
-
-              svg.append("text")
-                 .text(strOne)
-                 .attr("x", index)
-                 .attr("y", 60)
-                 .attr("fill", "black")
-                 .attr("font-family", "sans-serif")
-                 .attr("font-size", "18px")
-                 .attr("text-anchor", "middle");
-
-              svg.append("text")
-                 .text(strTwo)
-                 .attr("x", index)
-                 .attr("y", 90)
-                 .attr("fill", "black")
-                 .attr("font-family", "sans-serif")
-                 .attr("font-size", "18px")
-                 .attr("text-anchor", "middle");
-          }
+              .attr("stroke-width", 3)
+              .attr("opacity", 0.3)
+              .on("mouseover", eventMouseOver)
+              .on("mouseout", eventMouseOut);
       }
     });
+    
+    function eventMouseOver(d) {
+      d3.select("#tooltip").transition().duration(200).style("opacity", .9);      
+      
+      d3.select("#tooltip").html("<strong style='color:red'>" + d.times + "</strong><br>" + d.events)  
+        .style("left", (d3.event.pageX) + "px")     
+        .style("top", (d3.event.pageY - 28) + "px");
+    }
+    
+    function eventMouseOut() {
+      d3.select("#tooltip").transition().duration(500).style("opacity", 0);      
+    }
 }
 
 function deselectState () {
@@ -332,11 +315,13 @@ function makeChart (data) {
     .attr('width',  svgWidth)
     .attr('height', svgHeight)
     .append('g')
+    .attr('id', 'linegraph')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  // var svg = d3.select("#linegraph");
+
 
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
-  y.domain([0,d3.max(data, function(d) { return d.MedianPrice; })]);
-  // console.log(d3.max(data, function(d) { return d.MedianPrice; }));
+  y.domain([0,d3.max(data, function(d) { return d.MedianPrice; })]);  
 
   var zoom = d3.behavior.zoom()
     .y(y)
@@ -384,7 +369,9 @@ function makeChart (data) {
         .style("stroke", color(i % 20))
         .style("display", "none")
         .attr("clip-path", "url(#clip)")
-        .attr("d", line);
+        .attr("d", line)
+        .on("mouseover", lineMouseOver)
+        .on("mouseout", lineMouseOut);
 
     svg.append("text")
         .datum(data.filter(function(d) { 
@@ -406,7 +393,19 @@ function makeChart (data) {
     .attr("height", chartHeight);
 
 
-  addMarker(svg, chartWidth, svgHeight, x);
+  addMarker(svg, chartWidth, chartHeight, x);
+
+  function lineMouseOver(da) {
+    d3.select("." + da[0].State + "-line").style("stroke-width", 5);
+    d3.selectAll(".state")
+      .filter(function(d) { return d.id == da[0].State; })
+      .style("opacity", 0.5);
+  }
+
+  function lineMouseOut() {
+    d3.selectAll(".state-line").style("stroke-width", 2);
+    d3.selectAll(".state").style("opacity", 1);
+  }
 
   function zoomed() {
     // svg.select(".x.axis").call(xAxis);
@@ -431,6 +430,7 @@ function makeChart (data) {
   }
 
   d3.select("#resetlinegraph").on("click", reset);
+
 }
 
 var parseDate  = d3.time.format('%Y-%m-%d').parse;
