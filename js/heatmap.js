@@ -127,12 +127,17 @@ function updateHeatMap(year, quarter, waitTimerDrawMap, waitTimerLoadData){
             //Middle Yellowish Color = #FFFFBF, Green #006837, and Red = #A50026
             //Highest Price is $600,000
             //Lowest Price is &80,000
-            var averageColorRatio = averageInteger/600000;
+            var legendMedianPrice = 175000;
+            var greenOffset = 80000;
+            var redOffset = legendMedianPrice;
             var color;
-            if(averageInteger<150000){
-                color = d3.interpolate("#006837", "#FFFFBF")((averageInteger-80000)/70000);
+            if(averageInteger<legendMedianPrice){
+                color = d3.interpolate("#006837", "#FFFFBF")((averageInteger-greenOffset)/(legendMedianPrice-greenOffset));
             }else{
-                color = d3.interpolate("#FFFFBF", "#A50026")((averageInteger-150000)/450000);
+                if (averageInteger>450000){
+                    averageInteger = 450000;
+                }
+                color = d3.interpolate("#FFFFBF", "#A50026")((averageInteger-redOffset)/(350000-redOffset));
             }
 
 
