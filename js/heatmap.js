@@ -4,12 +4,14 @@ $( document ).ready(function() {
 
 $('#quarter').hide();
 $('#playButtonDiv').hide();
+$('#stopButtonDiv').hide();
 $('#loading').fadeOut(3000);
 
 setTimeout(function(){ 
     $('#amount') .prop('number', Math.floor(Math.random()*9999)).animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
     $('#quarter').show();
     $('#playButtonDiv').show();
+    $('#stopButtonDiv').show();
 
     $(function() {
         $( "#slider-range-min" ).slider({
@@ -25,6 +27,9 @@ setTimeout(function(){
             $( "#amount" ).animateNumber({ number: year },0);
             var quarter = Math.floor(((ui.value*100) - Math.floor(ui.value)*100)/25+1);  //Value from 1-4 representing which quarter
             document.getElementById("quarter").innerHTML = "Q"+quarter;
+
+            animationYear = year;
+            animationQuarter = quarter;
 
             updateHeatMap(year, quarter, 20, 20);
           }
@@ -144,8 +149,55 @@ function tooltipHtml(n, d){ /* function to create html content string in tooltip
         "<tr><td>Median</td><td>"+(d.median)+"</td></tr>"+
         "</table>";
 }
+var animationRunning = 0;
+var myInterval;
+var animationYear;
+var animationQuarter;
 function animateButton(){
-    alert("Animate Button Pressed!");
+    if(animationRunning==1){
+        clearInterval(myInterval);
+        animationYear = 2000;
+        animationQuarter = 1;
+    }else{
+        if(animationYear > 2010 && animationQuarter>2){
+            animationYear = 2000;
+            animationQuarter = 1;
+        }
+        if(!animationYear || !animationQuarter){
+            animationYear = 2000;
+            animationQuarter = 1;
+        }
+        animationRunning = 1;
+    }
+
+    myInterval = setInterval(function(){ 
+        /*Update Slider Info*/
+        $( "#amount" ).animateNumber({ number: animationYear },0);
+        $("#slider-range-min").slider('value',animationYear+animationQuarter*0.25);
+        document.getElementById("quarter").innerHTML = "Q"+animationQuarter;
+        //console.log($("#slider").slider('value'));
+
+        /*Update Heat Map*/
+        //console.log("Year: "+ animationYear + "Quarter: "+animationQuarter);
+        updateHeatMap(animationYear,animationQuarter,10,10);
+        animationQuarter++;
+        if(animationQuarter > 4){
+            //console.log("Increment Year and reset animationQuarter.");
+            animationQuarter = 1;
+            animationYear++;
+        }
+        if(animationYear==2010 && animationQuarter ==3){
+            //console.log("Interval Cleared");
+            animationRunning = 0;
+            animationYear = null;
+            animationQuarter = null;
+            clearInterval(myInterval);
+        }
+    }, 200);
+}
+function stopAnimationButton(){
+    animationRunning = 0;
+    clearInterval(myInterval);
 }
 function getStateArrayIndex(data){
     return stateArray.indexOf(data);
