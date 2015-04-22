@@ -1,84 +1,7 @@
 var completeDataSet;
-$( document ).ready(function() {
 
-
-$('#quarter').hide();
-$('#playButtonDiv').hide();
-$('#stopButtonDiv').hide();
-$('#legendContainer').hide();
-$('#loading').fadeOut(500);
-
-setTimeout(function(){ 
-    $('#amount').prop('number', Math.floor(Math.random()*9999))
-        .animateNumber({ number: 2000 , color:'black','font-size':'84px',easing:'easeInQuad'},1000);
-    $('#quarter').show();
-    $('#playButtonDiv').show();
-    $('#stopButtonDiv').show();
-    $('#legendContainer').show();
-
-    $(function() {
-        $( "#slider-range-min" ).slider({
-          range: "min",
-          value: 2000.00,
-          min: 2000.00,
-          max: 2010.49,
-          step:0.25,
-          slide: function( event, ui ) {
-
-            //Updates Slider Values
-            var year = Math.floor(ui.value);
-            $( "#amount" ).animateNumber({ number: year },0);
-            var quarter = Math.floor(((ui.value*100) - Math.floor(ui.value)*100)/25+1);  //Value from 1-4 representing which quarter
-            document.getElementById("quarter").innerHTML = "Q"+quarter;
-
-            animationYear = year;
-            animationQuarter = quarter;
-
-            updateHeatMap(year, quarter, 20, 20);
-            updateLineTime(year, quarter);
-          }
-        });
-        $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ));
-    });
-
-
- }, 500);
-
-// Closes the sidebar menu
-$("#menu-close").click(function(e) {
-    e.preventDefault();
-    $("#sidebar-wrapper").toggleClass("active");
-});
-
-// Opens the sidebar menu
-$("#menu-toggle").click(function(e) {
-    e.preventDefault();
-    $("#sidebar-wrapper").toggleClass("active");
-});
-
-// Scrolls to the selected menu item on the page
-$(function() {
-    $('a[href*=#]:not([href=#])').click(function() {
-        if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
-
-            var target = $(this.hash);
-            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-            if (target.length) {
-                $('html,body').animate({
-                    scrollTop: target.offset().top
-                }, 1000);
-                return false;
-            }
-        }
-    });
-});
-
-
-    //Data CSV File
-
-    d3.csv("dataset/dataset.csv", function(data){
-        completeDataSet = data;
-    });
+d3.csv("dataset/dataset.csv", function(data){
+    completeDataSet = data;
 });
 
 var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID=14,IL=15,IN=16,KS=17,KY=18,LS=19,MA=20,MD=21,ME=22,MI=23,MN=24,MO=25,MS=26,MT=27,NC=28,ND=29,NE=30,NH=31,NJ=32,NM=33,NV=34,NY=35,OH=36,OK=37,OR=38,PA=39,RI=40,SC=41,SD=42,TN=43,TX=44,UT=45,VA=46,VT=47,WA=48,WI=49,WV=50,WY=51;
@@ -159,57 +82,7 @@ function tooltipHtml(n, d){ /* function to create html content string in tooltip
         "<tr><td>Median</td><td>"+(d.median)+"</td></tr>"+
         "</table>";
 }
-var animationRunning = 0;
-var myInterval;
-var animationYear;
-var animationQuarter;
-function animateButton(){
-    if(animationRunning==1){
-        clearInterval(myInterval);
-        animationYear = 2000;
-        animationQuarter = 1;
-    }else{
-        if(animationYear > 2010 && animationQuarter>2){
-            animationYear = 2000;
-            animationQuarter = 1;
-        }
-        if(!animationYear || !animationQuarter){
-            animationYear = 2000;
-            animationQuarter = 1;
-        }
-        animationRunning = 1;
-    }
 
-    myInterval = setInterval(function(){ 
-        /*Update Slider Info*/
-        $( "#amount" ).animateNumber({ number: animationYear },0);
-        $("#slider-range-min").slider('value',animationYear+animationQuarter*0.25);
-        document.getElementById("quarter").innerHTML = "Q"+animationQuarter;
-        //console.log($("#slider").slider('value'));
-
-        /*Update Heat Map*/
-        //console.log("Year: "+ animationYear + "Quarter: "+animationQuarter);
-        updateHeatMap(animationYear,animationQuarter,10,10);
-        updateLineTime(animationYear,animationQuarter);
-        animationQuarter++;
-        if(animationQuarter > 4){
-            //console.log("Increment Year and reset animationQuarter.");
-            animationQuarter = 1;
-            animationYear++;
-        }
-        if(animationYear==2010 && animationQuarter ==3){
-            //console.log("Interval Cleared");
-            animationRunning = 0;
-            animationYear = null;
-            animationQuarter = null;
-            clearInterval(myInterval);
-        }
-    }, 200);
-}
-function stopAnimationButton(){
-    animationRunning = 0;
-    clearInterval(myInterval);
-}
 function getStateArrayIndex(data){
     return stateArray.indexOf(data);
 }
