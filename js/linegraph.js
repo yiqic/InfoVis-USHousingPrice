@@ -1,3 +1,5 @@
+/* All code in this file is written completely from scratch. */
+
 function formatQuarter (d) {
   if (d.substring(4) == "Q1") {
     return d.substring(0,4);
@@ -7,10 +9,13 @@ function formatQuarter (d) {
   }
 }
 
+// add event into linegraph
 function addMarker (svg, chartWidth, chartHeight, x) {
 
+    // read event data
     d3.csv("dataset/eventsquarter.csv", function(eventData) {
       
+      // Add line one by one representing events
       for (i = 0; i < eventData.length; i++) {
           svg.append("line")
               .datum(eventData[i])
@@ -27,6 +32,7 @@ function addMarker (svg, chartWidth, chartHeight, x) {
       }
     });
     
+    // perform details on demand
     function eventMouseOver(d) {
       d3.select("#tooltip").transition().duration(200).style("opacity", .9);      
       
@@ -43,19 +49,22 @@ function addMarker (svg, chartWidth, chartHeight, x) {
 function deselectState () {
   d3.selectAll(".state-group")
     .style("display", "none");
-  // d3.selectAll(".state-text")
-  //   .style("display", "none");
 }
 
 function selectState (stateData) {
-  // deselectState();
   d3.event.stopPropagation();
-  d3.selectAll("." + stateData.id + "-group")
-    .style("display", "inline");
+  var selected = d3.selectAll("." + stateData.id + "-group");
+  if (selected.style("display") == "inline") {
+    selected.style("display", "none");
+  }
+  else {
+    selected.style("display", "inline");
+  }
 }
 
 var xIndex; 
 
+// create line graph
 function makeChart (data) {
   var svgWidth  = 750,
       svgHeight = 300,
@@ -97,12 +106,14 @@ function makeChart (data) {
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
   y.domain([0,d3.max(data, function(d) { return d.AveragePrice; })]);  
 
+  // zoom in y axis
   var zoom = d3.behavior.zoom()
     .y(y)
     .scaleExtent([1, 10])
     .on("zoom", zoomed);
-
   svg.call(zoom, svg);
+
+  // add axis
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + chartHeight + ")")
@@ -121,6 +132,8 @@ function makeChart (data) {
   addMarker(svg, chartWidth, chartHeight, x);
 
   xIndex = x;
+  
+  // add lines into line graph
   svg.append("line")
     .attr("id", "time-line")
     .attr("x1", 0)
@@ -136,6 +149,7 @@ function makeChart (data) {
       .attr("clip-path", "url(#clip)")
       .attr("d", line);
 
+  // add dots that shown according to slider
   svg.selectAll(".dot")
       .data(data.filter(function(d) { return d.State == 'US'; }))
       .enter()
@@ -153,6 +167,7 @@ function makeChart (data) {
         }
       });
 
+  // add 'legend' of lines based on proximity design principle
   svg.append("text")
       .datum(data.filter(function(d) { 
         return d.State == 'US' && d.YearQuarter == '2010Q2'; 
@@ -165,6 +180,7 @@ function makeChart (data) {
 
   var states = d3.map(data, function(d) { return d.State; }).keys();
 
+  // add state line that shown when state is selected in the heatmap
   states.forEach(function (state, i) {
     var stateGroup = svg.append("g")
       .datum(data.filter(function(d) { return d.State == state; }))
@@ -217,6 +233,7 @@ function makeChart (data) {
     .attr("height", chartHeight);
 
 
+  // linking between linegraph and heatmap
   function lineMouseOver(da) {
     d3.select("." + da[0].State + "-line").style("stroke-width", 5);
     d3.selectAll(".state")
@@ -230,7 +247,6 @@ function makeChart (data) {
   }
 
   function zoomed() {
-    // svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
     svg.selectAll('path.line').attr('d', line); 
     svg.selectAll('.dot').attr('cy', function(d) { return y(d.AveragePrice); });
@@ -242,6 +258,7 @@ function makeChart (data) {
     });
   }
 
+  // reset zoom scale
   function reset() {
     d3.transition().duration(750).tween("zoom", function() {
           iy = d3.interpolate(y.domain(), [0,d3.max(data, function(d) { return d.AveragePrice; })]);
@@ -256,8 +273,7 @@ function makeChart (data) {
 
 }
 
-var parseDate = d3.time.format('%Y-%m-%d').parse;
-
+// update based on slider
 function updateLineTime(year, quarter) {
   var timeString = "" + year + "Q" + quarter;
   d3.select("#time-line")
@@ -274,6 +290,7 @@ function updateLineTime(year, quarter) {
     });
 }
 
+// load housing dataset
 d3.csv('dataset/dataset.csv', function (error, rawData) {
   if (error) {
     console.error(error);

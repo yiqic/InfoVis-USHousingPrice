@@ -1,3 +1,5 @@
+/* All code in this file is written completely from scratch. */
+
 var completeDataSet;
 
 d3.csv("dataset/dataset.csv", function(data){
@@ -8,7 +10,6 @@ var US=0,AK=1,AL=2,AR=3,AZ=4,CA=5,CO=6,CT=7,DC=8,DE=9,FL=10,GA=11,HI=12,IA=13,ID
 
 
 // Formula for Index: (state#) * 42 + year*4 + Quarter#
-
 
 function getIndex(StateName, Year, Quarter){
     if(StateName>51 || StateName<0){
@@ -81,6 +82,7 @@ function getColor(price) {
     return color;
 }
 
+// add legend to the heatmap
 function addLegend() {
     var legend = d3.select("#statesvg").append("g")
         .attr("transform", "translate(430, 180) scale(0.5)");
@@ -111,6 +113,11 @@ function addLegend() {
                 return "";
             }
         });
+
+    legend.append("text")
+        .attr("y", -22)
+        .attr("font-size", "24px")
+        .text("Average $")
 
 }
 

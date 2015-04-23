@@ -1,3 +1,4 @@
+/* All code in this file is written completely from scratch. */
 
 $( document ).ready(function() {
 
