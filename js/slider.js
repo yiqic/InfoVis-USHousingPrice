@@ -38,14 +38,8 @@ $( document ).ready(function() {
             });
             $( "#amount" ).val( $( "#slider-range-min" ).slider( "value" ));
         });
-
-
      }, 500);
-
-    
 });
-
-
 
 var animationRunning = 0;
 var myInterval;
