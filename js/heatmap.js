@@ -47,21 +47,9 @@ function updateHeatMap(year, quarter, waitTimerDrawMap, waitTimerLoadData){
             var average=completeDataSet[getIndex(getStateArrayIndex(d),year,quarter)].AveragePrice; 
             var median=completeDataSet[getIndex(getStateArrayIndex(d),year,quarter)].MedianPrice;
             var averageInteger = Number(average.replace(/[^0-9\.]+/g,""));
-            //Middle Yellowish Color = #FFFFBF, Green #006837, and Red = #A50026
-            //Highest Price is $600,000
-            //Lowest Price is &80,000
-            var legendMedianPrice = 175000;
-            var greenOffset = 80000;
-            var redOffset = legendMedianPrice;
-            var color;
-            if(averageInteger<legendMedianPrice){
-                color = d3.interpolate("#006837", "#FFFFBF")((averageInteger-greenOffset)/(legendMedianPrice-greenOffset));
-            }else{
-                if (averageInteger>450000){
-                    averageInteger = 450000;
-                }
-                color = d3.interpolate("#FFFFBF", "#A50026")((averageInteger-redOffset)/(350000-redOffset));
-            }
+            
+            var color = getColor(averageInteger);
+
 
 
             sampleData[d]={average:average, median:median, color: color};        
@@ -72,6 +60,58 @@ function updateHeatMap(year, quarter, waitTimerDrawMap, waitTimerLoadData){
         $("#statemap").empty();
         uStates.draw("#statemap", sampleData, tooltipHtml, selectState);
     },waitTimerDrawMap);
+}
+
+function getColor(price) {
+    //Middle Yellowish Color = #FFFFBF, Green #006837, and Red = #A50026
+    //Highest Price is $600,000
+    //Lowest Price is &80,000
+    var legendMedianPrice = 200000;
+    var greenOffset = 0;
+    var redOffset = legendMedianPrice;
+    var color;
+    if (price<legendMedianPrice) {
+        color = d3.interpolate("#006837", "#FFFFBF")((price-greenOffset)/(legendMedianPrice-greenOffset));
+    } else {
+        if (price>600000){
+            price = 600000;
+        }
+        color = d3.interpolate("#FFFFBF", "#A50026")((price-redOffset)/(600000-redOffset));
+    }
+    return color;
+}
+
+function addLegend() {
+    var legend = d3.select("#statesvg").append("g")
+        .attr("transform", "translate(430, 180) scale(0.5)");
+    var samplePrice = [];
+    for (var i = 0; i < 100; i++) {
+        samplePrice.push(i);
+    }
+    var legendBlock = legend.selectAll(".legendBlock")
+        .data(samplePrice)
+        .enter()
+        .append("g")
+        .attr("transform", function(d) { return "translate(0, " + (2 * d) + ")"; });
+
+    legendBlock.append("rect")
+        .attr("width", 20)
+        .attr("height", 3)
+        .style("fill", function(d) { return getColor(6000 * (100 - d)); });
+
+    legendBlock.append("text")
+        .attr("x", 24)
+        .attr("y", 10)
+        .attr("font-size", "24px")
+        .text(function(d) {
+            if (d % 33 == 0) {
+                return "$" + ((3 - (d / 33)) * 200) + "k";
+            }
+            else {
+                return "";
+            }
+        });
+
 }
 
 /*InfoVisGraph Code*/
@@ -88,6 +128,6 @@ function getStateArrayIndex(data){
 }
 
 updateHeatMap(2000,1, 350, 350);
+addLegend();
 
 d3.select("#statesvg").on("click", deselectState);
-

@@ -84,7 +84,7 @@ function makeChart (data) {
   var line = d3.svg.line()
       .interpolate('basis')
       .x(function(d) { return x(d.YearQuarter); })
-      .y(function(d) { return y(d.MedianPrice); });
+      .y(function(d) { return y(d.AveragePrice); });
 
   var svg = d3.select('#graph').append('svg')
     .attr('width',  svgWidth)
@@ -95,7 +95,7 @@ function makeChart (data) {
 
 
   x.domain(d3.map(data, function(d) { return d.YearQuarter; }).keys());
-  y.domain([0,d3.max(data, function(d) { return d.MedianPrice; })]);  
+  y.domain([0,d3.max(data, function(d) { return d.AveragePrice; })]);  
 
   var zoom = d3.behavior.zoom()
     .y(y)
@@ -116,7 +116,7 @@ function makeChart (data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Price ($)");
+      .text("Average Price ($)");
 
   addMarker(svg, chartWidth, chartHeight, x);
 
@@ -142,7 +142,7 @@ function makeChart (data) {
       .append("circle")
       .attr("class", "dot")
       .attr("cx", function(d) { return x(d.YearQuarter); })
-      .attr("cy", function(d) { return y(d.MedianPrice); })
+      .attr("cy", function(d) { return y(d.AveragePrice); })
       .attr("r", 5)
       .style("display", function(d) {
         if (d.YearQuarter == "2000Q1") {
@@ -158,7 +158,7 @@ function makeChart (data) {
         return d.State == 'US' && d.YearQuarter == '2010Q2'; 
       } ))
       .attr("transform", function(d) { 
-        return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+        return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].AveragePrice) + ")"; 
       })
       .attr("class", "us-text")
       .text("US");
@@ -187,7 +187,7 @@ function makeChart (data) {
         .attr("class", "dot")
         .style("fill", color(i % 20))
         .attr("cx", function(d) { return x(d.YearQuarter); })
-        .attr("cy", function(d) { return y(d.MedianPrice); })
+        .attr("cy", function(d) { return y(d.AveragePrice); })
         .attr("r", 5)
         .style("display", function(d) {
           if (d.YearQuarter == "2000Q1") {
@@ -203,7 +203,7 @@ function makeChart (data) {
           return d.State == state && d.YearQuarter == '2010Q2'; 
         } ))
         .attr("transform", function(d) { 
-          return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+          return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].AveragePrice) + ")"; 
         })
         .attr("class", "state-text " + state + "-line")
         .text(state);
@@ -233,18 +233,18 @@ function makeChart (data) {
     // svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
     svg.selectAll('path.line').attr('d', line); 
-    svg.selectAll('.dot').attr('cy', function(d) { return y(d.MedianPrice); });
+    svg.selectAll('.dot').attr('cy', function(d) { return y(d.AveragePrice); });
     svg.selectAll('.us-text').attr("transform", function(d) { 
-      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].AveragePrice) + ")"; 
     });
     svg.selectAll('.state-text').attr("transform", function(d) { 
-      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].MedianPrice) + ")"; 
+      return "translate(" + (x(d[0].YearQuarter)+5) + "," + y(d[0].AveragePrice) + ")"; 
     });
   }
 
   function reset() {
     d3.transition().duration(750).tween("zoom", function() {
-          iy = d3.interpolate(y.domain(), [0,d3.max(data, function(d) { return d.MedianPrice; })]);
+          iy = d3.interpolate(y.domain(), [0,d3.max(data, function(d) { return d.AveragePrice; })]);
       return function(t) {
         zoom.y(y.domain(iy(t)));
         zoomed();

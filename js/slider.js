@@ -4,7 +4,6 @@ $( document ).ready(function() {
     $('#quarter').hide();
     $('#playButtonDiv').hide();
     $('#stopButtonDiv').hide();
-    $('#legendContainer').hide();
     $('#loading').fadeOut(500);
 
     setTimeout(function(){ 
@@ -13,7 +12,6 @@ $( document ).ready(function() {
         $('#quarter').show();
         $('#playButtonDiv').show();
         $('#stopButtonDiv').show();
-        $('#legendContainer').show();
 
         $(function() {
             $( "#slider-range-min" ).slider({
@@ -74,7 +72,6 @@ function animateButton(){
         $( "#amount" ).animateNumber({ number: animationYear },0);
         $("#slider-range-min").slider('value',animationYear+animationQuarter*0.25);
         document.getElementById("quarter").innerHTML = "Q"+animationQuarter;
-        //console.log($("#slider").slider('value'));
 
         /*Update Heat Map*/
         //console.log("Year: "+ animationYear + "Quarter: "+animationQuarter);
